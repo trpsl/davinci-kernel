@@ -735,7 +735,7 @@ static int goodix_ts_input_report(struct input_dev *dev,
 	}
 
 	/*report finger*/
-	if ((core_data->event_status & 0x88) == 0x88 && core_data->fod_enabled) {
+	if ((core_data->event_status & 0x88) == 0x88 && core_data->fod_status) {
 		input_report_key(core_data->input_dev, BTN_INFO, 1);
 		core_data->fod_pressed = true;
 		ts_info("BTN_INFO press");
