@@ -2713,8 +2713,8 @@ static int qseecom_load_app(struct qseecom_dev_handle *data, void __user *argp)
 		ret = 0;
 	} else {
 		first_time = true;
-		pr_warn("App (%s) does'nt exist, loading apps for first time\n",
-			(char *)(load_img_req.img_name));
+		//pr_warn("App (%s) does'nt exist, loading apps for first time\n",
+		//	(char *)(load_img_req.img_name));
 
 		ret = qseecom_vaddr_map(load_img_req.ifd_data_fd,
 				&pa, &vaddr, &sgt, &attach, &len, &dmabuf);
@@ -2831,8 +2831,8 @@ static int qseecom_load_app(struct qseecom_dev_handle *data, void __user *argp)
 		spin_unlock_irqrestore(&qseecom.registered_app_list_lock,
 									flags);
 
-		pr_warn("App with id %u (%s) now loaded\n", app_id,
-		(char *)(load_img_req.img_name));
+		//pr_warn("App with id %u (%s) now loaded\n", app_id,
+		//(char *)(load_img_req.img_name));
 	}
 	data->client.app_id = app_id;
 	data->client.app_arch = load_img_req.app_arch;
@@ -2914,7 +2914,7 @@ static int __qseecom_unload_app(struct qseecom_dev_handle *data,
 	}
 	switch (resp.result) {
 	case QSEOS_RESULT_SUCCESS:
-		pr_warn("App (%d) is unloaded\n", app_id);
+		//pr_warn("App (%d) is unloaded\n", app_id);
 		break;
 	case QSEOS_RESULT_INCOMPLETE:
 		ret = __qseecom_process_incomplete_cmd(data, &resp);
@@ -8720,7 +8720,7 @@ static int qseecom_retrieve_ce_data(struct platform_device *pdev)
 			pce_entry++;
 		}
 	} else {
-		pr_warn("Device does not support PFE");
+		//pr_warn("Device does not support PFE");
 		file_encrypt_pipe = 0xff;
 	}
 
@@ -9040,21 +9040,21 @@ static int qseecom_probe(struct platform_device *pdev)
 
 	rc = alloc_chrdev_region(&qseecom_device_no, 0, 1, QSEECOM_DEV);
 	if (rc < 0) {
-		pr_err("alloc_chrdev_region failed %d\n", rc);
+		//pr_err("alloc_chrdev_region failed %d\n", rc);
 		return rc;
 	}
 
 	driver_class = class_create(THIS_MODULE, QSEECOM_DEV);
 	if (IS_ERR(driver_class)) {
 		rc = -ENOMEM;
-		pr_err("class_create failed %d\n", rc);
+		//pr_err("class_create failed %d\n", rc);
 		goto exit_unreg_chrdev_region;
 	}
 
 	class_dev = device_create(driver_class, NULL, qseecom_device_no, NULL,
 			QSEECOM_DEV);
 	if (IS_ERR(class_dev)) {
-		pr_err("class_device_create failed %d\n", rc);
+		//pr_err("class_device_create failed %d\n", rc);
 		rc = -ENOMEM;
 		goto exit_destroy_class;
 	}
@@ -9064,7 +9064,7 @@ static int qseecom_probe(struct platform_device *pdev)
 
 	rc = cdev_add(&qseecom.cdev, MKDEV(MAJOR(qseecom_device_no), 0), 1);
 	if (rc < 0) {
-		pr_err("cdev_add failed %d\n", rc);
+		//pr_err("cdev_add failed %d\n", rc);
 		goto exit_destroy_device;
 	}
 
@@ -9086,9 +9086,9 @@ static int qseecom_probe(struct platform_device *pdev)
 	rc = qseecom_scm_call(6, 3, &feature, sizeof(feature),
 		&resp, sizeof(resp));
 	mutex_unlock(&app_access_lock);
-	pr_info("qseecom.qsee_version = 0x%x\n", resp.result);
+	//pr_info("qseecom.qsee_version = 0x%x\n", resp.result);
 	if (rc) {
-		pr_err("Failed to get QSEE version info %d\n", rc);
+		//pr_err("Failed to get QSEE version info %d\n", rc);
 		goto exit_del_cdev;
 	}
 	qseecom.qsee_version = resp.result;
@@ -9100,7 +9100,7 @@ static int qseecom_probe(struct platform_device *pdev)
 
 	rc = dma_set_mask(qseecom.dev, DMA_BIT_MASK(64));
 	if (rc) {
-		pr_err("qseecom failed to set dma mask %d\n", rc);
+		//pr_err("qseecom failed to set dma mask %d\n", rc);
 		goto exit_del_cdev;
 	}
 
@@ -9116,43 +9116,43 @@ static int qseecom_probe(struct platform_device *pdev)
 		qseecom.appsbl_qseecom_support =
 				of_property_read_bool((&pdev->dev)->of_node,
 						"qcom,appsbl-qseecom-support");
-		pr_debug("qseecom.appsbl_qseecom_support = 0x%x",
-				qseecom.appsbl_qseecom_support);
+		//pr_debug("qseecom.appsbl_qseecom_support = 0x%x",
+		//		qseecom.appsbl_qseecom_support);
 
 		qseecom.commonlib64_loaded =
 				of_property_read_bool((&pdev->dev)->of_node,
 						"qcom,commonlib64-loaded-by-uefi");
-		pr_debug("qseecom.commonlib64-loaded-by-uefi = 0x%x",
-				qseecom.commonlib64_loaded);
+		//pr_debug("qseecom.commonlib64-loaded-by-uefi = 0x%x",
+		//		qseecom.commonlib64_loaded);
 		qseecom.fde_key_size =
 			of_property_read_bool((&pdev->dev)->of_node,
 						"qcom,fde-key-size");
 		qseecom.no_clock_support =
 				of_property_read_bool((&pdev->dev)->of_node,
 						"qcom,no-clock-support");
-		if (!qseecom.no_clock_support) {
-			pr_info("qseecom clocks handled by other subsystem\n");
-		} else {
-			pr_info("no-clock-support=0x%x",
-			qseecom.no_clock_support);
-		}
+		//if (!qseecom.no_clock_support) {
+		//	pr_info("qseecom clocks handled by other subsystem\n");
+		//} else {
+		//	pr_info("no-clock-support=0x%x",
+		//	qseecom.no_clock_support);
+		//}
 
 		if (of_property_read_u32((&pdev->dev)->of_node,
 					"qcom,qsee-reentrancy-support",
 					&qseecom.qsee_reentrancy_support)) {
-			pr_warn("qsee reentrancy support phase is not defined, setting to default 0\n");
+			//pr_warn("qsee reentrancy support phase is not defined, setting to default 0\n");
 			qseecom.qsee_reentrancy_support = 0;
-		} else {
-			pr_warn("qseecom.qsee_reentrancy_support = %d\n",
-				qseecom.qsee_reentrancy_support);
+		//} else {
+			//pr_warn("qseecom.qsee_reentrancy_support = %d\n",
+			//	qseecom.qsee_reentrancy_support);
 		}
 
 		qseecom.enable_key_wrap_in_ks =
 			of_property_read_bool((&pdev->dev)->of_node,
 					"qcom,enable-key-wrap-in-ks");
 		if (qseecom.enable_key_wrap_in_ks) {
-			pr_warn("qseecom.enable_key_wrap_in_ks = %d\n",
-					qseecom.enable_key_wrap_in_ks);
+			//pr_warn("qseecom.enable_key_wrap_in_ks = %d\n",
+			//		qseecom.enable_key_wrap_in_ks);
 		}
 
 		/*
@@ -9160,7 +9160,7 @@ static int qseecom_probe(struct platform_device *pdev)
 		 * crypto clock is not handled by HLOS.
 		 */
 		if (qseecom.no_clock_support && qseecom.support_bus_scaling) {
-			pr_err("support_bus_scaling flag can not be enabled.\n");
+			//pr_err("support_bus_scaling flag can not be enabled.\n");
 			rc = -EINVAL;
 			goto exit_destroy_ion_client;
 		}
@@ -9168,7 +9168,7 @@ static int qseecom_probe(struct platform_device *pdev)
 		if (of_property_read_u32((&pdev->dev)->of_node,
 				"qcom,ce-opp-freq",
 				&qseecom.ce_opp_freq_hz)) {
-			pr_debug("CE operating frequency is not defined, setting to default 100MHZ\n");
+			//pr_debug("CE operating frequency is not defined, setting to default 100MHZ\n");
 			qseecom.ce_opp_freq_hz = QSEE_CE_CLK_100MHZ;
 		}
 		rc = __qseecom_init_clk(CLK_QSEE);
@@ -9227,17 +9227,17 @@ static int qseecom_probe(struct platform_device *pdev)
 					cmd_buf = (void *)&req_64bit;
 					cmd_len = sizeof(struct
 					qsee_apps_region_info_64bit_ireq);
-					pr_warn("secure app region addr=0x%llx size=0x%x",
-						req_64bit.addr, req_64bit.size);
+					//pr_warn("secure app region addr=0x%llx size=0x%x",
+					//	req_64bit.addr, req_64bit.size);
 				}
 			} else {
-				pr_err("Fail to get secure app region info\n");
+				//pr_err("Fail to get secure app region info\n");
 				rc = -EINVAL;
 				goto exit_deinit_clock;
 			}
 			rc = __qseecom_enable_clk(CLK_QSEE);
 			if (rc) {
-				pr_err("CLK_QSEE enabling failed (%d)\n", rc);
+				//pr_err("CLK_QSEE enabling failed (%d)\n", rc);
 				rc = -EIO;
 				goto exit_deinit_clock;
 			}
@@ -9248,8 +9248,8 @@ static int qseecom_probe(struct platform_device *pdev)
 			mutex_unlock(&app_access_lock);
 			__qseecom_disable_clk(CLK_QSEE);
 			if (rc || (resp.result != QSEOS_RESULT_SUCCESS)) {
-				pr_err("send secapp reg fail %d resp.res %d\n",
-							rc, resp.result);
+				//pr_err("send secapp reg fail %d resp.res %d\n",
+				//			rc, resp.result);
 				rc = -EINVAL;
 				goto exit_deinit_clock;
 			}
@@ -9279,15 +9279,15 @@ static int qseecom_probe(struct platform_device *pdev)
 	}
 
 	qseecom.whitelist_support = qseecom_check_whitelist_feature();
-	pr_warn("qseecom.whitelist_support = %d\n",
-				qseecom.whitelist_support);
+	//pr_warn("qseecom.whitelist_support = %d\n",
+	//			qseecom.whitelist_support);
 
 	/*create a kthread to process pending listener unregister task */
 	qseecom.unregister_lsnr_kthread_task = kthread_run(
 			__qseecom_unregister_listener_kthread_func,
 			NULL, "qseecom-unreg-lsnr");
 	if (IS_ERR(qseecom.unregister_lsnr_kthread_task)) {
-		pr_err("failed to create kthread to unregister listener\n");
+		//pr_err("failed to create kthread to unregister listener\n");
 		rc = -EINVAL;
 		goto exit_deinit_clock;
 	}
@@ -9299,15 +9299,15 @@ static int qseecom_probe(struct platform_device *pdev)
 			__qseecom_unload_app_kthread_func,
 			NULL, "qseecom-unload-ta");
 	if (IS_ERR(qseecom.unload_app_kthread_task)) {
-		pr_err("failed to create kthread to unload ta\n");
+		//pr_err("failed to create kthread to unload ta\n");
 		rc = -EINVAL;
 		goto exit_kill_unreg_lsnr_kthread;
 	}
 	atomic_set(&qseecom.unload_app_kthread_state,
 						UNLOAD_APP_KT_SLEEP);
 
-	if (!qseecom.qsee_perf_client)
-		pr_err("Unable to register bus client\n");
+	//if (!qseecom.qsee_perf_client)
+	//	pr_err("Unable to register bus client\n");
 
 	atomic_set(&qseecom.qseecom_state, QSEECOM_STATE_READY);
 	return 0;
