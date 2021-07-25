@@ -38,6 +38,7 @@
 #include <linux/input/mt.h>
 #include <linux/backlight.h>
 #include "../xiaomi/xiaomi_touch.h"
+#include <linux/devfreq_boost.h>
 
 #define INPUT_TYPE_B_PROTOCOL
 #define INPUT_EVENT_START						0
@@ -736,6 +737,7 @@ static int goodix_ts_input_report(struct input_dev *dev,
 
 	/*report finger*/
 	if ((core_data->event_status & 0x88) == 0x88 && core_data->fod_status) {
+		devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 100);
 		input_report_key(core_data->input_dev, BTN_INFO, 1);
 		core_data->fod_pressed = true;
 		ts_info("BTN_INFO press");
