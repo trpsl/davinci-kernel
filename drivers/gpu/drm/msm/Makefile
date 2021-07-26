@@ -212,11 +212,13 @@ msm_drm-$(CONFIG_DRM_MSM) += \
 	msm_gpu.o \
 	msm_iommu.o \
 	msm_smmu.o \
-	msm_perf.o \
-	msm_rd.o \
 	msm_ringbuffer.o \
 	msm_prop.o \
-	msm_fence.o \
-	msm_debugfs.o
+	msm_fence.o
 
 obj-$(CONFIG_DRM_MSM)	+= msm_drm.o
+
+obj-$(DRM_MSM_DEBUG_SHIT) +=  \
+	msm_perf.o \
+	msm_rd.o \
+	msm_debugfs.o

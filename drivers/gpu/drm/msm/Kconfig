@@ -198,3 +198,9 @@ config DRM_SDE_RSC
 	  avoids the display core power collapse. A client can also register
 	  for display core power collapse events on rsc.
 
+config DRM_MSM_DEBUG_SHIT
+	bool "Enable debug shit"
+	depends on DEBUG_FS
+	help
+	  The DRM_MSM_DEBUG_SHIT will enable, well.. debug shit.
+	  Imagine that.
