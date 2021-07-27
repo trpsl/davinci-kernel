@@ -36,6 +36,7 @@ gen_headers_out_arm64 = [
     "asm/termios.h",
     "asm/types.h",
     "misc/akm09970.h",
+    "misc/drv8846.h",
 
     // From include/uapi/**/*.h
 

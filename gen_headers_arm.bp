@@ -40,6 +40,7 @@ gen_headers_out_arm = [
     "asm/termbits.h",
     "asm/termios.h",
     "misc/akm09970.h",
+    "misc/drv8846.h",
 
     // From include/uapi/**/*.h
 
