@@ -22,6 +22,7 @@ struct qg_batt_props {
 	int			vbatt_full_mv;
 	int			fastchg_curr_ma;
 	int			qg_profile_version;
+	int			nom_cap_uah;
 };
 
 struct qg_irq_info {
@@ -90,6 +91,22 @@ struct qg_esr_data {
 	bool			valid;
 };
 
+#define BATT_MA_AVG_SAMPLES	8
+struct batt_params {
+	bool		update_now;
+	int			batt_raw_soc;
+	int			batt_soc;
+	int			samples_num;
+	int			samples_index;
+	int			batt_ma_avg_samples[BATT_MA_AVG_SAMPLES];
+	int			batt_ma_avg;
+	int			batt_ma_prev;
+	int			batt_ma;
+	int			batt_mv;
+	int			batt_temp;
+	struct timespec		last_soc_change_time;
+};
+
 struct qpnp_qg {
 	struct device		*dev;
 	struct pmic_revid_data	*pmic_rev_id;
@@ -102,6 +119,9 @@ struct qpnp_qg {
 	struct cdev		qg_cdev;
 	struct device_node	*batt_node;
 	dev_t			dev_no;
+	struct batt_params	param;
+	struct delayed_work	soc_monitor_work;
+	struct delayed_work	force_shutdown_work;
 	struct work_struct	udata_work;
 	struct work_struct	scale_soc_work;
 	struct work_struct	qg_status_change_work;
@@ -130,6 +150,7 @@ struct qpnp_qg {
 
 	/* status variable */
 	u32			*debug_mask;
+	bool			force_shutdown;
 	bool			qg_device_open;
 	bool			profile_loaded;
 	bool			battery_missing;
