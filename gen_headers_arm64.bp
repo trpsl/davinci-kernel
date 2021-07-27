@@ -35,6 +35,7 @@ gen_headers_out_arm64 = [
     "asm/termbits.h",
     "asm/termios.h",
     "asm/types.h",
+    "misc/akm09970.h",
 
     // From include/uapi/**/*.h
 

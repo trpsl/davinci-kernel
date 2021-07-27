@@ -39,6 +39,7 @@ gen_headers_out_arm = [
     "asm/sockios.h",
     "asm/termbits.h",
     "asm/termios.h",
+    "misc/akm09970.h",
 
     // From include/uapi/**/*.h
 
