@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016-2020, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -36,6 +37,8 @@
 #define DSI_CMD_PPS_SIZE 135
 
 #define DSI_MODE_MAX 5
+
+#define BUF_LEN_MAX    256
 
 enum dsi_panel_rotation {
 	DSI_PANEL_ROTATE_NONE = 0,
@@ -119,8 +122,12 @@ struct dsi_backlight_config {
 	u32 bl_scale;
 	u32 bl_scale_ad;
 	bool bl_inverted_dbv;
+	bool dcs_type_ss_ea;
+	bool dcs_type_ss_eb;
 
 	int en_gpio;
+	bool bl_remap_flag;
+	bool samsung_prepare_hbm_flag;
 	/* PWM params */
 	struct pwm_device *pwm_bl;
 	bool pwm_enabled;
@@ -157,8 +164,10 @@ enum esd_check_status_mode {
 
 struct drm_panel_esd_config {
 	bool esd_enabled;
+	bool esd_aod_enabled;
 
 	enum esd_check_status_mode status_mode;
+	struct dsi_panel_cmd_set offset_cmd;
 	struct dsi_panel_cmd_set status_cmd;
 	u32 *status_cmds_rlen;
 	u32 *status_valid_params;
@@ -166,6 +175,17 @@ struct drm_panel_esd_config {
 	u8 *return_buf;
 	u8 *status_buf;
 	u32 groups;
+	int esd_err_irq_gpio;
+	int esd_err_irq;
+	int esd_err_irq_flags;
+};
+
+struct dsi_read_config {
+	bool enabled;
+	struct dsi_panel_cmd_set read_cmd;
+	u32 cmds_rlen;
+	u32 valid_bits;
+	u8 rbuf[64];
 };
 
 struct dsi_panel {
@@ -212,12 +232,51 @@ struct dsi_panel {
 	bool te_using_watchdog_timer;
 	u32 qsync_min_fps;
 
+	bool dispparam_enabled;
+	u32 skip_dimmingon;
+
 	char dsc_pps_cmd[DSI_CMD_PPS_SIZE];
 	enum dsi_dms_mode dms_mode;
 
 	bool sync_broadcast_en;
 	int power_mode;
 	enum dsi_panel_physical_type panel_type;
+
+	u32 panel_on_dimming_delay;
+	struct delayed_work cmds_work;
+	struct delayed_work nolp_bl_delay_work;
+	u32 last_bl_lvl;
+	s32 backlight_delta;
+	u32 backlight_pulse_threshold;
+
+	bool hbm_enabled;
+	u32 hbm_brightness;
+	bool fod_hbm_enabled;
+	bool fod_dimlayer_enabled;
+	bool fod_dimlayer_hbm_enabled;
+	u32 fod_ui_ready;
+	u32 doze_backlight_threshold;
+	u32 fod_off_dimming_delay;
+	ktime_t fod_backlight_off_time;
+	ktime_t fod_hbm_off_time;
+	u32 hbm_ntfy_skip_flag;
+
+	bool elvss_dimming_check_enable;
+	struct dsi_read_config elvss_dimming_cmds;
+	struct dsi_panel_cmd_set elvss_dimming_offset;
+	struct dsi_panel_cmd_set hbm_fod_on;
+	struct dsi_panel_cmd_set hbm_fod_off;
+
+	u8 panel_read_data[BUF_LEN_MAX];
+
+	bool fod_backlight_flag;
+	bool fod_flag;
+	u32 fod_target_backlight;
+	bool in_aod; /* set DISPPARAM_DOZE_BRIGHTNESS_HBM/LBM only in AOD */
+	int doze_brightness;
+	bool panel_dead_flag;
+
+	bool nolp_command_set_backlight_enabled;
 };
 
 static inline bool dsi_panel_ulps_feature_enabled(struct dsi_panel *panel)
@@ -337,5 +396,27 @@ struct dsi_panel *dsi_panel_ext_bridge_get(struct device *parent,
 int dsi_panel_parse_esd_reg_read_configs(struct dsi_panel *panel);
 
 void dsi_panel_ext_bridge_put(struct dsi_panel *panel);
+
+int dsi_panel_get_cmd_pkt_count(const char *data, u32 length, u32 *cnt);
+int dsi_panel_alloc_cmd_packets(struct dsi_panel_cmd_set *cmd,
+				u32 packet_count);
+int dsi_panel_create_cmd_packets(const char *data,
+				u32 length,
+				u32 count,
+				struct dsi_cmd_desc *cmd);
+void dsi_panel_destroy_cmd_packets(struct dsi_panel_cmd_set *set);
+void dsi_panel_dealloc_cmd_packets(struct dsi_panel_cmd_set *set);
+
+int dsi_panel_write_cmd_set(struct dsi_panel *panel,
+				struct dsi_panel_cmd_set *cmd_sets);
+
+int dsi_panel_read_cmd_set(struct dsi_panel *panel,
+				struct dsi_read_config *read_config);
+
+ssize_t dsi_panel_mipi_reg_write(struct dsi_panel *panel,
+				char *buf, size_t count);
+
+ssize_t dsi_panel_mipi_reg_read(struct dsi_panel *panel,
+				char *buf);
 
 #endif /* _DSI_PANEL_H_ */
