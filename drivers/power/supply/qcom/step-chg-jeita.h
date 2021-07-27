@@ -13,7 +13,9 @@
 #ifndef __STEP_CHG_H__
 #define __STEP_CHG_H__
 
-#define MAX_STEP_CHG_ENTRIES	8
+#define MAX_STEP_CHG_ENTRIES	5
+
+#define BATT_WARM_THRESHOLD		450
 
 struct step_chg_jeita_param {
 	u32			psy_prop;
@@ -34,4 +36,6 @@ void qcom_step_chg_deinit(void);
 int read_range_data_from_node(struct device_node *node,
 		const char *prop_str, struct range_data *ranges,
 		int max_threshold, u32 max_value);
+int get_val(struct range_data *range, int hysteresis, int current_index,
+		int threshold, int *new_index, int *val);
 #endif /* __STEP_CHG_H__ */
