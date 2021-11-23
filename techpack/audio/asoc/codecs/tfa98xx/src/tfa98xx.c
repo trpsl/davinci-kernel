@@ -3864,7 +3864,7 @@ int tfa98xx_init_misc_device(struct tfa98xx *tfa98xx)
 	/* create device node "tfa_rpc_X" for switching profile. */
 	tfa98xx->tfa98xx_rpc.minor = MISC_DYNAMIC_MINOR;
 	tfa98xx->tfa98xx_rpc.name = miscdevice_info[MISC_DEVICE_TFA98XX_RPC].devicename;
-	tfa98xx->tfa98xx_rpc.fops = &miscdevice_info[MISC^DEVICE_TFA98XX_RPC].operations;
+	tfa98xx->tfa98xx_rpc.fops = &miscdevice_info[MISC_DEVICE_TFA98XX_RPC].operations;
 	ret = misc_register(&tfa98xx->tfa98xx_rpc);
 	if (ret) {
 		pr_err("tfa98xx_init_misc_device: register misc device [%s] failed\n", tfa98xx->tfa98xx_rpc.name);
