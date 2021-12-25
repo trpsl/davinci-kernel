@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 4.14.255 Kernel Configuration
+# Linux/arm64 4.14.258 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
@@ -874,8 +874,6 @@ CONFIG_IPV6_SUBTREES=y
 # CONFIG_IPV6_SEG6_LWTUNNEL is not set
 # CONFIG_IPV6_SEG6_HMAC is not set
 CONFIG_NETLABEL=y
-CONFIG_WIREGUARD=y
-# CONFIG_WIREGUARD_DEBUG is not set
 CONFIG_NETWORK_SECMARK=y
 CONFIG_NET_PTP_CLASSIFY=y
 # CONFIG_NETWORK_PHY_TIMESTAMPING is not set
@@ -2060,6 +2058,8 @@ CONFIG_CNSS_GENL=y
 #
 # CONFIG_WAN is not set
 # CONFIG_VMXNET3 is not set
+CONFIG_WIREGUARD=y
+# CONFIG_WIREGUARD_DEBUG is not set
 # CONFIG_ISDN is not set
 # CONFIG_NVM is not set
 
